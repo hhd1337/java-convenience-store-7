@@ -8,4 +8,10 @@ public class Stock {
     public Stock(List<Product> products) {
         this.products = products;
     }
+
+    public boolean existsByName(String name) {
+        return products.stream().anyMatch(
+                product -> product.getName().equals(name)
+        );
+    }
 }
