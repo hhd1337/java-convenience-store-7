@@ -10,8 +10,11 @@ public class Stock {
     }
 
     public boolean existsByName(String name) {
-        return products.stream().anyMatch(
-                product -> product.getName().equals(name)
-        );
+        if (products.stream().anyMatch(
+                p -> p.getName().equals(name)
+        )) {
+            return true;
+        }
+        throw new IllegalArgumentException("[ERROR] 존재하지 않는 상품입니다. 상품이름을 다시 입력해주세요.");
     }
 }
