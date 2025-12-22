@@ -16,4 +16,8 @@ public class OrderItem {
     public int getQuantity() {
         return this.quantity;
     }
+
+    public int calculateItemTotalPrice(int price) {
+        return this.quantity * price;
+    }
 }

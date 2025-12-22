@@ -12,6 +12,7 @@ public class PaymentCalculator {
     }
 
     private int calculateItemPurchaseAmount(OrderItem item, Stock stock) {
-        return stock.findPriceByName(item.getName()) * item.getQuantity();
+        int unitPrice = stock.findPriceByName(item.getName());
+        return item.calculateItemTotalPrice(unitPrice);
     }
 }
