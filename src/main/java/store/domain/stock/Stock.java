@@ -1,4 +1,4 @@
-package store.domain;
+package store.domain.stock;
 
 import java.util.List;
 

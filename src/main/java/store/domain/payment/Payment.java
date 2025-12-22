@@ -1,4 +1,8 @@
-package store.domain;
+package store.domain.payment;
+
+import store.domain.order.Order;
+import store.domain.order.OrderItem;
+import store.domain.stock.Stock;
 
 public class Payment {
     private final Order order;
