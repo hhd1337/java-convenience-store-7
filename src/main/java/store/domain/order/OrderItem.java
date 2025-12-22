@@ -1,5 +1,7 @@
 package store.domain.order;
 
+import store.util.ErrorMessage;
+
 public class OrderItem {
     private final String name;
     private int quantity;
@@ -23,7 +25,7 @@ public class OrderItem {
 
     public void validatePositiveCount(int count) {
         if (count < 1) {
-            throw new IllegalArgumentException("[ERROR] 1개 이상의 상품만 구매하실 수 있습니다.");
+            throw new IllegalArgumentException(ErrorMessage.PREFIX + "1개 이상의 상품만 구매하실 수 있습니다.");
         }
     }
 }
