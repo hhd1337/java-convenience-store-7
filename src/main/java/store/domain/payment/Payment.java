@@ -5,7 +5,7 @@ import store.domain.order.OrderItem;
 import store.domain.stock.Stock;
 
 public class Payment {
-    private final Order order;
+    private Order order;
     private final Stock stock;
 
     public Payment(Order order, Stock stock) {

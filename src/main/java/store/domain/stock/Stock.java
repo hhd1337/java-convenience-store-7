@@ -1,6 +1,7 @@
 package store.domain.stock;
 
 import java.util.List;
+import store.domain.order.OrderItem;
 import store.util.ErrorMessage;
 
 public class Stock {
@@ -16,6 +17,10 @@ public class Stock {
         )) {
             throw new IllegalArgumentException(ErrorMessage.PREFIX + "존재하지 않는 상품입니다. 상품이름을 다시 입력해주세요.");
         }
+    }
+
+    public void existsByNames(List<OrderItem> orderItems) {
+        orderItems.forEach(item -> existsByName(item.getName()));
     }
 
     public int findQuantityByName(String name) {
