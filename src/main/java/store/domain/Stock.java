@@ -31,4 +31,12 @@ public class Stock {
         }
         return true;
     }
+
+    public int findPriceByName(String name) {
+        return products.stream()
+                .filter(p -> p.getName().equals(name))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("[ERROR] " + name + "은 존재하지 않는 상품입니다. 다시 입력해주세요."))
+                .getPrice();
+    }
 }
