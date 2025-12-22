@@ -11,7 +11,7 @@ public class Stock {
         this.products = products;
     }
 
-    public void existsByName(String name) {
+    public void validateProductExistsByName(String name) {
         if (products.stream().noneMatch(
                 p -> p.getName().equals(name)
         )) {
@@ -19,8 +19,8 @@ public class Stock {
         }
     }
 
-    public void existsByNames(List<OrderItem> orderItems) {
-        orderItems.forEach(item -> existsByName(item.getName()));
+    public void validateOrderItemProductsExist(List<OrderItem> orderItems) {
+        orderItems.forEach(item -> validateProductExistsByName(item.getName()));
     }
 
     public int findQuantityByName(String name) {
