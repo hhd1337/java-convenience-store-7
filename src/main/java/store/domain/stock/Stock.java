@@ -10,13 +10,12 @@ public class Stock {
         this.products = products;
     }
 
-    public boolean existsByName(String name) {
-        if (products.stream().anyMatch(
+    public void existsByName(String name) {
+        if (products.stream().noneMatch(
                 p -> p.getName().equals(name)
         )) {
-            return true;
+            throw new IllegalArgumentException(ErrorMessage.PREFIX + "존재하지 않는 상품입니다. 상품이름을 다시 입력해주세요.");
         }
-        throw new IllegalArgumentException(ErrorMessage.PREFIX + "존재하지 않는 상품입니다. 상품이름을 다시 입력해주세요.");
     }
 
     public int findQuantityByName(String name) {
