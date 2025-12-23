@@ -1,6 +1,6 @@
 package store;
 
-import store.controller.ConvenienceStoreController;
+import store.controller.ConvenienceStore;
 import store.view.InputView;
 import store.view.OutputView;
 
@@ -9,7 +9,7 @@ public class Application {
         InputView inputView = new InputView();
         OutputView outputView = new OutputView();
 
-        ConvenienceStoreController convenienceStoreController = new ConvenienceStoreController(inputView, outputView);
-        convenienceStoreController.run();
+        ConvenienceStore convenienceStore = new ConvenienceStore(inputView, outputView);
+        convenienceStore.open();
     }
 }
