@@ -11,7 +11,6 @@ public class Payment {
     public Payment(Order order, Stock stock) {
         this.order = order;
         this.stock = stock;
-        validateOrderAgainstStock();
     }
 
     public int calculateTotalPurchaseAmount() {
@@ -23,6 +22,7 @@ public class Payment {
     }
 
     private int calculateItemPurchaseAmount(OrderItem item) {
+        // validateOrderAgainstStock();
         int unitPrice = stock.findPriceByName(item.getName());
         return item.calculateItemTotalPrice(unitPrice);
     }
