@@ -18,6 +18,6 @@ public class Promotion {
     }
 
     public boolean isPromotionActive(LocalDate today) {
-        return endDate.isAfter(today) && startDate.isBefore(today);
+        return !today.isBefore(startDate) && !today.isAfter(endDate);
     }
 }
