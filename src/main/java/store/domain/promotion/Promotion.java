@@ -17,7 +17,7 @@ public class Promotion {
         this.endDate = endDate;
     }
 
-    public boolean isPromotionActive(LocalDate today) {
+    public boolean isActive(LocalDate today) {
         return !today.isBefore(startDate) && !today.isAfter(endDate);
     }
 }
