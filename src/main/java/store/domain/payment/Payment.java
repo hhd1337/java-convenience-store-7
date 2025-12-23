@@ -11,12 +11,11 @@ public class Payment {
     public Payment(Order order, Stock stock) {
         this.order = order;
         this.stock = stock;
+        validateOrderAgainstStock();
     }
 
     public int calculateTotalPurchaseAmount() {
-        // 재고 검증, 예외로직
-        order.getOrderItems()
-                .forEach(item -> stock.hasEnoughStock(item.getName(), item.getQuantity()));
+        validateOrderAgainstStock();
 
         return order.getOrderItems().stream()
                 .mapToInt(this::calculateItemPurchaseAmount)
@@ -26,5 +25,12 @@ public class Payment {
     private int calculateItemPurchaseAmount(OrderItem item) {
         int unitPrice = stock.findPriceByName(item.getName());
         return item.calculateItemTotalPrice(unitPrice);
+    }
+
+    private void validateOrderAgainstStock() {
+        order.getOrderItems().forEach(item -> {
+            stock.validateProductExistsByName(item.getName()); // 주문 아이템이 재고에 존재하는지
+            stock.validateEnoughStock(item.getName(), item.getQuantity()); // 주문한 수량이 재고에 충분히 있는지
+        });
     }
 }
