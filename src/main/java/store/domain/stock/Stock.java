@@ -19,7 +19,7 @@ public class Stock {
         }
     }
 
-    public void validateOrderItemProductsExist(List<OrderItem> orderItems) {
+    public void validateOrderProductsExist(List<OrderItem> orderItems) {
         orderItems.forEach(item -> validateProductExistsByName(item.getName()));
     }
 
@@ -30,11 +30,10 @@ public class Stock {
                 .sum();
     }
 
-    public boolean hasEnoughStock(String name, int quantity) {
+    public void validateEnoughStock(String name, int quantity) {
         if (quantity > findQuantityByName(name)) {
             throw new IllegalArgumentException(ErrorMessage.PREFIX + name + "상품 재고가 부족합니다. 다시 입력해주세요.");
         }
-        return true;
     }
 
     public int findPriceByName(String name) {
