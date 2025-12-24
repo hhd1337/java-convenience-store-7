@@ -1,7 +1,6 @@
 package store.controller;
 
 import java.util.List;
-import store.domain.promotion.Promotion;
 import store.domain.promotion.PromotionCatalog;
 import store.domain.stock.Product;
 import store.domain.stock.Stock;
@@ -20,11 +19,21 @@ public class ConvenienceStore {
     }
 
     public void open() {
-        List<Product> products = ProductFileReader.read();
-        Stock stock = new Stock(products);
+        Stock stock = new Stock(ProductFileReader.read());
+        PromotionCatalog promotionCatalog = new PromotionCatalog(PromotionFileReader.read());
 
-        List<Promotion> promotions = PromotionFileReader.read();
-        PromotionCatalog promotionCatalog = new PromotionCatalog(promotions);
-
+        outputView.printStock(toStockLines(stock.getProducts()));
     }
+
+    private List<String> toStockLines(List<Product> products) {
+        return products.stream()
+                .map(p -> {
+                    String promotion = p.getPromotion();
+                    if (promotion == null) {
+                        promotion = "재고 없음";
+                    }
+                    return p.getName() + " " + p.getPrice() + "원 " + p.getQuantity() + "개 " + promotion;
+                }).toList();
+    }
+
 }

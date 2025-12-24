@@ -24,4 +24,8 @@ public class Product {
     public int getPrice() {
         return this.price;
     }
+
+    public String getPromotion() {
+        return this.promotion;
+    }
 }

@@ -39,4 +39,8 @@ public class Stock {
                         ErrorMessage.PREFIX + " " + name + "은 존재하지 않는 상품입니다. 다시 입력해주세요."))
                 .getPrice();
     }
+
+    public List<Product> getProducts() {
+        return this.products;
+    }
 }
