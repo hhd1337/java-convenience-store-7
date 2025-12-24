@@ -11,4 +11,9 @@ public class OutputView {
         }
         System.out.println("\n구매하실 상품명과 수량을 입력해주세요. (예: [사이다-2],[감자칩-1])");
     }
+
+    public void printGetMoreItemDuePromotion(String itemName, int benefitCount) {
+        System.out.println("현재 " + itemName + "은(는)" + benefitCount + "개를 무료로 더 받을 수 있습니다. 추가하시겠습니까?");
+        System.out.print("(Y/N)");
+    }
 }
