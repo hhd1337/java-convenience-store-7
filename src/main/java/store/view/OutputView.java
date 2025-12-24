@@ -49,6 +49,10 @@ public class OutputView {
         System.out.println("내실돈" + "\t\t\t" + formatNumberWithComma(receipt.summary().finalPayAmount()));
     }
 
+    public void printMorePurchaseAskMessage() {
+        System.out.print("감사합니다. 구매하고 싶은 다른 상품이 있나요? (Y/N)");
+    }
+
     private String formatNumberWithComma(int amount) {
         return MONEY.format(amount);
     }
