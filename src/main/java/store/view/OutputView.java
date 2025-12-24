@@ -20,4 +20,8 @@ public class OutputView {
     public void printBenefitCanNotApplyDueStockLack(String itemName, int benefitNotApplyCount) {
         System.out.println("현재 " + itemName + "은(는)" + benefitNotApplyCount + "");
     }
+
+    public void printMembershipDiscountApplyOrNot() {
+        System.out.println("멤버십 할인을 받으시겠습니까? (Y/N)");
+    }
 }
