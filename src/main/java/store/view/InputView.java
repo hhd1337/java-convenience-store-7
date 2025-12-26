@@ -14,7 +14,7 @@ public class InputView {
     }
 
     public boolean readYesNo() {
-        String input = Console.readLine().trim();
+        String input = Console.readLine().trim().toUpperCase();
         if (input.equals("Y")) {
             return true;
         }
