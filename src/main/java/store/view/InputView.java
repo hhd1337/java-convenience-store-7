@@ -13,6 +13,17 @@ public class InputView {
         return parseProductNameAndQuantity(input);
     }
 
+    public boolean readYesNo() {
+        String input = Console.readLine().trim();
+        if (input.equals("Y")) {
+            return true;
+        }
+        if (input.equals("N")) {
+            return false;
+        }
+        throw new IllegalArgumentException(ErrorMessage.PREFIX + " 잘못된 입력입니다. 다시 입력해주세요.");
+    }
+
     private Map<String, Integer> parseProductNameAndQuantity(String input) {
         Map<String, Integer> quantitiesByName = new LinkedHashMap<>();
 
