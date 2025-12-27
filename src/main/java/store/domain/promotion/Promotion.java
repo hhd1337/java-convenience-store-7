@@ -20,4 +20,8 @@ public class Promotion {
     public boolean isActive(LocalDate today) {
         return !today.isBefore(startDate) && !today.isAfter(endDate);
     }
+
+    public String getName() {
+        return this.name;
+    }
 }
