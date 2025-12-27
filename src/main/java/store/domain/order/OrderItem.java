@@ -28,4 +28,8 @@ public class OrderItem {
             throw new IllegalArgumentException(ErrorMessage.PREFIX + "1개 이상의 상품만 구매하실 수 있습니다.");
         }
     }
+
+    public void increaseQuantity(int additionalCount) {
+        this.quantity = this.quantity + additionalCount;
+    }
 }
