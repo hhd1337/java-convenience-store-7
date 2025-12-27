@@ -31,7 +31,13 @@ public class ConvenienceStore {
         // 2. 구매할 상품명과 수량 입력받아 저장
         List<OrderItem> orderItems = inputView.readProductNameAndQuantity();
 
-        // 3. Stock과 비교해서 프로모션 적용해서 무료로 더 받을 수 있는지 확인, 사용자에게 묻고 OrderItem에 반영하기
+        // 3. 주문 입력 직후, 재고에 존재하는 상품인지, 재고에 상품이 충분한지 검증
+        for (OrderItem item : orderItems) {
+            stock.validateProductExistsByName(item.getName());
+            stock.validateEnoughStock(item.getName(), item.getQuantity());
+        }
+
+        // 4. Stock과 비교해서 프로모션 적용해서 무료로 더 받을 수 있는지 확인, 사용자에게 묻고 OrderItem에 반영하기
         for (OrderItem item : orderItems) {
             int addCount = getAdditionalFreeCount(item, stock, promotionCatalog);
             if (addCount > 0) {
@@ -41,7 +47,7 @@ public class ConvenienceStore {
                 }
             }
         }
-        // 4. 프로모션 재고부족, 일부수량 프로모션 혜택없이 구매해야 할 경우, 일부수량 정가로 결제할지 묻고 OrderItem에 반영
+        // 5. 프로모션 재고부족, 일부수량 프로모션 혜택없이 구매해야 할 경우, 일부수량 정가로 결제할지 묻고 OrderItem에 반영
         for (OrderItem item : orderItems) {
             // 4-1. 프로모션 재고부족, 일부수량 프로모션 혜택없이 구매해야 할 경우가 있는지 확인
             int count = getRegularPriceCount(item, stock);
@@ -58,18 +64,18 @@ public class ConvenienceStore {
             }
         }
 
-        // 5. Order, Payment 생성
+        // 6. Order, Payment 생성
         Order order = new Order(orderItems);
         Payment payment = new Payment(order, stock);
 
-        // 6. 멤버십 할인 받을지 입력받기
+        // 7. 멤버십 할인 받을지 입력받기
         outputView.printMembershipDiscountApplyOrNot();
         boolean membershipDC = inputView.readYesNo();
-        // 7. 영수증 출력
+        // 8. 영수증 출력
 
-        // 8. 재고 차감
+        // 9. 재고 차감
 
-        // 9. 다른상품구매할지 입력받아 해당 여부에 따라 while문 탈출/종료 혹은 1번으로 돌아갈지 결정
+        // 10. 다른상품구매할지 입력받아 해당 여부에 따라 while문 탈출/종료 혹은 1번으로 돌아갈지 결정
 
     }
 

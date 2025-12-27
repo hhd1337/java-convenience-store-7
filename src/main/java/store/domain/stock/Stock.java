@@ -27,7 +27,7 @@ public class Stock {
     public int findQuantityByName(String name) {
         return products.stream()
                 .filter(p -> p.getName().equals(name))
-                .mapToInt(p -> p.getQuantity()) //.mapToInt(Product::getQuantity)
+                .mapToInt(Product::getQuantity)
                 .sum();
     }
 
