@@ -9,6 +9,10 @@ import store.domain.payment.Payment;
 import store.domain.promotion.Promotion;
 import store.domain.promotion.PromotionCatalog;
 import store.domain.stock.Stock;
+import store.dto.ReceiptDto;
+import store.dto.ReceiptDto.GiftLine;
+import store.dto.ReceiptDto.PaymentSummary;
+import store.dto.ReceiptDto.PurchaseLine;
 import store.file.ProductFileReader;
 import store.file.PromotionFileReader;
 import store.view.InputView;
@@ -79,11 +83,58 @@ public class ConvenienceStore {
         boolean membershipDC = inputView.readYesNo();
 
         // 9. 영수증 출력
-
+        ReceiptDto receiptDto = createReceiptDto(payment, giftItems, membershipDC);
+        outputView.printTotalReceipt(receiptDto);
         // 10. 재고 차감
 
         // 11. 다른상품구매할지 입력받아 해당 여부에 따라 while문 탈출/종료 혹은 1번으로 돌아갈지 결정
 
+    }
+
+    private ReceiptDto createReceiptDto(Payment payment, List<GiftItem> giftItems, boolean membershipDiscountYes) {
+        // Payment에서 필요한 정보들 꺼내서 ReceiptDto 만들기
+        Order order = payment.getOrder();
+        List<OrderItem> orderItems = order.getOrderItems();
+
+        Stock stock = payment.getStock();
+
+        List<ReceiptDto.PurchaseLine> purchases;
+        List<ReceiptDto.GiftLine> gifts;
+        ReceiptDto.PaymentSummary summary;
+
+        purchases = orderItems.stream()
+                .map(item -> {
+                    String name = item.getName();
+                    int quantity = item.getQuantity();
+                    int amount = quantity * stock.findPriceByName(name);
+
+                    return new PurchaseLine(name, quantity, amount);
+                })
+                .toList();
+
+        gifts = giftItems.stream()
+                .map(item -> new GiftLine(item.name(), item.quantity()))
+                .toList();
+
+        int totalItemQuantity = orderItems.stream()
+                .mapToInt(OrderItem::getQuantity)
+                .sum();
+        int totalAmountBeforeDiscount = payment.calculateTotalPurchaseAmount();
+        int promotionDiscount = giftItems.stream()
+                .mapToInt(item -> stock.findPriceByName(item.name()) * item.quantity())
+                .sum();
+
+        int membershipDiscount = 0;
+        if (membershipDiscountYes) {
+            membershipDiscount = (int) Math.min(8000, (totalAmountBeforeDiscount - promotionDiscount) * 0.3);
+        }
+
+        int finalPayAmount = totalAmountBeforeDiscount - promotionDiscount - membershipDiscount;
+
+        summary = new PaymentSummary(totalItemQuantity, totalAmountBeforeDiscount, promotionDiscount,
+                membershipDiscount, finalPayAmount);
+
+        return new ReceiptDto(purchases, gifts, summary);
     }
 
     private List<GiftItem> calculateGiftItems(List<OrderItem> orderItems, Stock stock, PromotionCatalog pc) {
