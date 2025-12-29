@@ -211,4 +211,14 @@ public class ConvenienceStore {
         }
         return cycle - remain;
     }
+
+    private int findGetByProductName(String productName, Stock stock, PromotionCatalog pc) {
+        String promoName = stock.findPromotionByProductName(productName);
+        return pc.findPromotionByName(promoName).getGet();
+    }
+
+    private int findBuyByProductName(String productName, Stock stock, PromotionCatalog pc) {
+        String promoName = stock.findPromotionByProductName(productName);
+        return pc.findPromotionByName(promoName).getBuy();
+    }
 }
