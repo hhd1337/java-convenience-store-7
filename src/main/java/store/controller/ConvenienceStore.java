@@ -6,7 +6,6 @@ import store.domain.order.Order;
 import store.domain.order.OrderItem;
 import store.domain.order.PromotionAppliedItem;
 import store.domain.payment.Payment;
-import store.domain.promotion.Promotion;
 import store.domain.promotion.PromotionCatalog;
 import store.domain.stock.Stock;
 import store.dto.ReceiptDto;
@@ -145,26 +144,13 @@ public class ConvenienceStore {
 
         for (OrderItem item : orderItems) {
             String name = item.getName();
-            String promotionName;
             // 이 아이템이 프로모션상품이 없으면 다음 아이템으로 넘어감.
             try {
-                promotionName = stock.findPromotionByProductName(name);
+                stock.findPromotionByProductName(name);
             } catch (IllegalArgumentException e) {
                 continue;
             }
 
-            Promotion promotion = pc.findPromotionByName(promotionName);
-
-            int buy = promotion.getBuy();
-            int get = promotion.getGet();
-            int cycle = buy + get;
-            // 재고에 현재 프로모션 아이템 수량이 계산한 PromoProductQuantity 만큼 있는지 확인.
-            // 주문수량 중 프로모션 재고를 초과한 수량을 받아서 그만큼을 제외한, 현재 해당상품 프로모션상품 수를 promotionAppliedItems객체에 대입
-//            int PromoProductQuantity = (item.getQuantity() / cycle) * get;
-//            int num = calculateNonPromotionAppliedQuantity(item, stock, pc);
-//            if (num > 0) {
-//                PromoProductQuantity = PromoProductQuantity - num;
-//            }
             int nonPromotionAppliedQuantity = calculateNonPromotionAppliedQuantity(item, stock, pc);
 
             promotionAppliedItems.add(new PromotionAppliedItem(name, item.getQuantity() - nonPromotionAppliedQuantity));
@@ -180,13 +166,9 @@ public class ConvenienceStore {
     private int calculateNonPromotionAppliedQuantity(OrderItem item, Stock stock, PromotionCatalog pc) {
         int orderQuantity = item.getQuantity();
         String itemName = item.getName();
-
         int promotionStockQuantity = stock.findPromotionProductCountByName(itemName);
-        String promotionName = stock.findPromotionByProductName(itemName);
-        Promotion promotion = pc.findPromotionByName(promotionName);
-
-        int buy = promotion.getBuy();
-        int get = promotion.getGet();
+        int get = findGetByProductName(itemName, stock, pc);
+        int buy = findBuyByProductName(itemName, stock, pc);
         int cycle = buy + get;
 
         int promotionApplicable = (promotionStockQuantity / cycle) * cycle;
@@ -195,14 +177,10 @@ public class ConvenienceStore {
     }
 
     private int getAdditionalFreeCount(OrderItem item, Stock stock, PromotionCatalog pc) {
+        String itemName = item.getName();
         int orderQuantity = item.getQuantity();
-
-        String promotionName = stock.findPromotionByProductName(item.getName());
-        Promotion promotion = pc.findPromotionByName(promotionName);
-
-        int buy = promotion.getBuy();
-        int get = promotion.getGet();
-
+        int get = findGetByProductName(itemName, stock, pc);
+        int buy = findBuyByProductName(itemName, stock, pc);
         int cycle = buy + get;
         int remain = orderQuantity % cycle;
 
