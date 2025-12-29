@@ -60,7 +60,7 @@ public class ConvenienceStore {
         // 6. 프로모션 재고부족, 일부수량 프로모션 혜택없이 구매해야 할 경우, 일부수량 정가로 결제할지 묻고 OrderItem에 반영
         for (OrderItem item : orderItems) {
             // 4-1. 프로모션 재고부족, 일부수량 프로모션 혜택없이 구매해야 할 경우가 있는지 확인
-            int count = calculateNonPromotionAppliedQuantity(item, stock);
+            int count = calculateNonPromotionAppliedQuantity(item, stock, promotionCatalog);
 
             if (count > 0) {
                 outputView.printBenefitCanNotApplyDueStockLack(item.getName(), count);
@@ -159,7 +159,7 @@ public class ConvenienceStore {
 
             // 재고에 현재 프로모션 아이템 수량이 계산한 PromoProductQuantity 만큼 있는지 확인.
             // 주문수량 중 프로모션 재고를 초과한 수량을 받아서 그만큼을 제외한, 현재 해당상품 프로모션상품 수를 giftItems객체에 대입
-            int num = calculateNonPromotionAppliedQuantity(item, stock);
+            int num = calculateNonPromotionAppliedQuantity(item, stock, pc);
             if (num > 0) {
                 PromoProductQuantity = PromoProductQuantity - num;
             }
@@ -170,14 +170,25 @@ public class ConvenienceStore {
         return giftItems;
     }
 
-    // 주문수량 중 프로모션 재고를 초과한 수량 반환, 음수이면 0 반환
-    private int calculateNonPromotionAppliedQuantity(OrderItem item, Stock stock) {
+    // 원래 : 주문수량 중 프로모션 재고를 초과한 수량 반환, 음수이면 0 반환
+    // 변경해야 함 :
+    // (A) 프로모션을 적용할 수 있는 ‘최대 총개수(구매+증정)’를 구하고
+    // (B) orderQuantity에서 그걸 뺀 나머지 개수 = “프로모션 할인이 적용되지 않는 개수”
+    private int calculateNonPromotionAppliedQuantity(OrderItem item, Stock stock, PromotionCatalog pc) {
         int orderQuantity = item.getQuantity();
         String itemName = item.getName();
 
         int promotionStockQuantity = stock.findPromotionProductCountByName(itemName);
+        String promotionName = stock.findPromotionByProductName(itemName);
+        Promotion promotion = pc.findPromotionByName(promotionName);
 
-        return Math.max(0, orderQuantity - promotionStockQuantity);
+        int buy = promotion.getBuy();
+        int get = promotion.getGet();
+        int cycle = buy + get;
+
+        int promotionApplicable = (promotionStockQuantity / cycle) * cycle;
+
+        return Math.max(0, orderQuantity - promotionApplicable);
     }
 
     private int getAdditionalFreeCount(OrderItem item, Stock stock, PromotionCatalog pc) {
