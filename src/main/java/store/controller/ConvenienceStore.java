@@ -83,7 +83,7 @@ public class ConvenienceStore {
         boolean membershipDC = inputView.readYesNo();
 
         // 9. 영수증 출력
-        ReceiptDto receiptDto = createReceiptDto(payment, promotionAppliedItems, membershipDC);
+        ReceiptDto receiptDto = createReceiptDto(payment, promotionAppliedItems, membershipDC, promotionCatalog);
         outputView.printTotalReceipt(receiptDto);
         // 10. 재고 차감
 
@@ -92,7 +92,7 @@ public class ConvenienceStore {
     }
 
     private ReceiptDto createReceiptDto(Payment payment, List<PromotionAppliedItem> promotionAppliedItems,
-                                        boolean membershipDiscountYes) {
+                                        boolean membershipDiscountYes, PromotionCatalog pc) {
         // Payment에서 필요한 정보들 꺼내서 ReceiptDto 만들기
         Order order = payment.getOrder();
         List<OrderItem> orderItems = order.getOrderItems();
@@ -114,7 +114,13 @@ public class ConvenienceStore {
                 .toList();
 
         gifts = promotionAppliedItems.stream()
-                .map(item -> new GiftLine(item.name(), item.quantity()))
+                .map(item -> {
+                    String itemName = item.name();
+                    int get = findGetByProductName(itemName, stock, pc);
+                    int buy = findBuyByProductName(itemName, stock, pc);
+                    int giftQuantity = calculateGiftQuantity(buy, get, item.quantity());
+                    return new GiftLine(itemName, giftQuantity);
+                })
                 .toList();
 
         int totalItemQuantity = orderItems.stream()
@@ -198,5 +204,10 @@ public class ConvenienceStore {
     private int findBuyByProductName(String productName, Stock stock, PromotionCatalog pc) {
         String promoName = stock.findPromotionByProductName(productName);
         return pc.findPromotionByName(promoName).getBuy();
+    }
+
+    private int calculateGiftQuantity(int buy, int get, int promotionAppliedItemsQuantity) {
+        int cycle = get + buy;
+        return (promotionAppliedItemsQuantity / cycle) * get;
     }
 }
