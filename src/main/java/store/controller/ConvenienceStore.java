@@ -90,7 +90,7 @@ public class ConvenienceStore {
         boolean membershipDC = inputView.readYesNo();
 
         // 9. 영수증 출력
-        ReceiptDto receiptDto = createReceiptDto(payment, promotionAppliedItems, membershipDC, pc);
+        ReceiptDto receiptDto = createReceiptDto(payment, promotionAppliedItems, membershipDC, pc, today);
         outputView.printTotalReceipt(receiptDto);
         // 10. 재고 차감
 
@@ -99,7 +99,7 @@ public class ConvenienceStore {
     }
 
     private ReceiptDto createReceiptDto(Payment payment, List<PromotionAppliedItem> promotionAppliedItems,
-                                        boolean membershipDiscountYes, PromotionCatalog pc) {
+                                        boolean membershipDiscountYes, PromotionCatalog pc, LocalDate today) {
         // Payment에서 필요한 정보들 꺼내서 ReceiptDto 만들기
         Order order = payment.getOrder();
         List<OrderItem> orderItems = order.getOrderItems();
@@ -124,7 +124,7 @@ public class ConvenienceStore {
                 .map(item -> {
                     String itemName = item.name();
                     Promotion promotion = findPromotionOrNull(itemName, stock, pc);
-                    if (promotion != null) {
+                    if (promotion != null && promotion.isActive(today)) {
                         int get = promotion.getGet();
                         int buy = promotion.getBuy();
                         int giftQuantity = calculateGiftQuantity(buy, get, item.quantity());
