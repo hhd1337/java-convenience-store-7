@@ -174,14 +174,20 @@ public class ConvenienceStore {
     private int calculateNonPromotionAppliedQuantity(OrderItem item, Stock stock, PromotionCatalog pc) {
         int orderQuantity = item.getQuantity();
         String itemName = item.getName();
-        int promotionStockQuantity = stock.findPromotionProductCountByName(itemName);
-        int get = findGetByProductName(itemName, stock, pc);
-        int buy = findBuyByProductName(itemName, stock, pc);
-        int cycle = buy + get;
 
-        int promotionApplicable = (promotionStockQuantity / cycle) * cycle;
+        try {
+            int promotionStockQuantity = stock.findPromotionProductCountByName(itemName);
 
-        return Math.max(0, orderQuantity - promotionApplicable);
+            int get = findGetByProductName(itemName, stock, pc);
+            int buy = findBuyByProductName(itemName, stock, pc);
+            int cycle = buy + get;
+
+            int promotionApplicable = (promotionStockQuantity / cycle) * cycle;
+            return Math.max(0, orderQuantity - promotionApplicable);
+
+        } catch (IllegalArgumentException e) {
+            return orderQuantity; // 프로모션 상품이 없으면, 프로모션 적용 불가 수량 = 전체 주문 수량
+        }
     }
 
     private int getAdditionalFreeCount(OrderItem item, Stock stock, PromotionCatalog pc) {
