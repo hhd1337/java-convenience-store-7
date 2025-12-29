@@ -2,9 +2,9 @@ package store.controller;
 
 import java.util.ArrayList;
 import java.util.List;
-import store.domain.order.GiftItem;
 import store.domain.order.Order;
 import store.domain.order.OrderItem;
+import store.domain.order.PromotionAppliedItem;
 import store.domain.payment.Payment;
 import store.domain.promotion.Promotion;
 import store.domain.promotion.PromotionCatalog;
@@ -43,8 +43,9 @@ public class ConvenienceStore {
             stock.validateEnoughStock(item.getName(), item.getQuantity());
         }
 
-        // 4. GiftItem 리스트를 만들음. 이후 사용자와 대화하며 orderItems와 giftItems를 계속 수정
-        List<GiftItem> giftItems = calculateGiftItems(orderItems, stock, promotionCatalog);
+        // 4. PromotionAppliedItem 리스트를 만들음. 이후 사용자와 대화하며 orderItems와 promotionAppliedItems를 계속 수정
+        List<PromotionAppliedItem> promotionAppliedItems = calculatePromotionAppliedItems(orderItems, stock,
+                promotionCatalog);
 
         // 5. Stock과 비교해서 프로모션 적용해서 무료로 더 받을 수 있는지 확인, 사용자에게 묻고 OrderItem에 반영하기
         for (OrderItem item : orderItems) {
@@ -83,7 +84,7 @@ public class ConvenienceStore {
         boolean membershipDC = inputView.readYesNo();
 
         // 9. 영수증 출력
-        ReceiptDto receiptDto = createReceiptDto(payment, giftItems, membershipDC);
+        ReceiptDto receiptDto = createReceiptDto(payment, promotionAppliedItems, membershipDC);
         outputView.printTotalReceipt(receiptDto);
         // 10. 재고 차감
 
@@ -91,7 +92,8 @@ public class ConvenienceStore {
 
     }
 
-    private ReceiptDto createReceiptDto(Payment payment, List<GiftItem> giftItems, boolean membershipDiscountYes) {
+    private ReceiptDto createReceiptDto(Payment payment, List<PromotionAppliedItem> promotionAppliedItems,
+                                        boolean membershipDiscountYes) {
         // Payment에서 필요한 정보들 꺼내서 ReceiptDto 만들기
         Order order = payment.getOrder();
         List<OrderItem> orderItems = order.getOrderItems();
@@ -112,7 +114,7 @@ public class ConvenienceStore {
                 })
                 .toList();
 
-        gifts = giftItems.stream()
+        gifts = promotionAppliedItems.stream()
                 .map(item -> new GiftLine(item.name(), item.quantity()))
                 .toList();
 
@@ -120,7 +122,7 @@ public class ConvenienceStore {
                 .mapToInt(OrderItem::getQuantity)
                 .sum();
         int totalAmountBeforeDiscount = payment.calculateTotalPurchaseAmount();
-        int promotionDiscount = giftItems.stream()
+        int promotionDiscount = promotionAppliedItems.stream()
                 .mapToInt(item -> stock.findPriceByName(item.name()) * item.quantity())
                 .sum();
 
@@ -137,8 +139,9 @@ public class ConvenienceStore {
         return new ReceiptDto(purchases, gifts, summary);
     }
 
-    private List<GiftItem> calculateGiftItems(List<OrderItem> orderItems, Stock stock, PromotionCatalog pc) {
-        List<GiftItem> giftItems = new ArrayList<>();
+    private List<PromotionAppliedItem> calculatePromotionAppliedItems(List<OrderItem> orderItems, Stock stock,
+                                                                      PromotionCatalog pc) {
+        List<PromotionAppliedItem> promotionAppliedItems = new ArrayList<>();
 
         for (OrderItem item : orderItems) {
             String name = item.getName();
@@ -155,19 +158,19 @@ public class ConvenienceStore {
             int buy = promotion.getBuy();
             int get = promotion.getGet();
             int cycle = buy + get;
-            int PromoProductQuantity = (item.getQuantity() / cycle) * get;
-
             // 재고에 현재 프로모션 아이템 수량이 계산한 PromoProductQuantity 만큼 있는지 확인.
-            // 주문수량 중 프로모션 재고를 초과한 수량을 받아서 그만큼을 제외한, 현재 해당상품 프로모션상품 수를 giftItems객체에 대입
-            int num = calculateNonPromotionAppliedQuantity(item, stock, pc);
-            if (num > 0) {
-                PromoProductQuantity = PromoProductQuantity - num;
-            }
+            // 주문수량 중 프로모션 재고를 초과한 수량을 받아서 그만큼을 제외한, 현재 해당상품 프로모션상품 수를 promotionAppliedItems객체에 대입
+//            int PromoProductQuantity = (item.getQuantity() / cycle) * get;
+//            int num = calculateNonPromotionAppliedQuantity(item, stock, pc);
+//            if (num > 0) {
+//                PromoProductQuantity = PromoProductQuantity - num;
+//            }
+            int nonPromotionAppliedQuantity = calculateNonPromotionAppliedQuantity(item, stock, pc);
 
-            giftItems.add(new GiftItem(name, PromoProductQuantity));
+            promotionAppliedItems.add(new PromotionAppliedItem(name, item.getQuantity() - nonPromotionAppliedQuantity));
         }
 
-        return giftItems;
+        return promotionAppliedItems;
     }
 
     // 원래 : 주문수량 중 프로모션 재고를 초과한 수량 반환, 음수이면 0 반환
