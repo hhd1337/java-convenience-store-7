@@ -29,7 +29,7 @@ public class ConvenienceStore {
 
     public void open() {
         Stock stock = new Stock(ProductFileReader.read());
-        PromotionCatalog promotionCatalog = new PromotionCatalog(PromotionFileReader.read());
+        PromotionCatalog pc = new PromotionCatalog(PromotionFileReader.read());
 
         // 1. 인사, 재고 출력
         outputView.printStock(StockLineMapper.toLines(stock.getProducts()));
@@ -43,12 +43,11 @@ public class ConvenienceStore {
         }
 
         // 4. PromotionAppliedItem 리스트를 만들음. 이후 사용자와 대화하며 orderItems와 promotionAppliedItems를 계속 수정
-        List<PromotionAppliedItem> promotionAppliedItems = calculatePromotionAppliedItems(orderItems, stock,
-                promotionCatalog);
+        List<PromotionAppliedItem> promotionAppliedItems = calculatePromotionAppliedItems(orderItems, stock, pc);
 
         // 5. Stock과 비교해서 프로모션 적용해서 무료로 더 받을 수 있는지 확인, 사용자에게 묻고 OrderItem에 반영하기
         for (OrderItem item : orderItems) {
-            int addCount = getAdditionalFreeCount(item, stock, promotionCatalog);
+            int addCount = getAdditionalFreeCount(item, stock, pc);
             if (addCount > 0) {
                 outputView.printGetMoreItemDuePromotion(item.getName(), addCount);
                 if (inputView.readYesNo()) {
@@ -60,7 +59,7 @@ public class ConvenienceStore {
         // 6. 프로모션 재고부족, 일부수량 프로모션 혜택없이 구매해야 할 경우, 일부수량 정가로 결제할지 묻고 OrderItem에 반영
         for (OrderItem item : orderItems) {
             // 4-1. 프로모션 재고부족, 일부수량 프로모션 혜택없이 구매해야 할 경우가 있는지 확인
-            int count = calculateNonPromotionAppliedQuantity(item, stock, promotionCatalog);
+            int count = calculateNonPromotionAppliedQuantity(item, stock, pc);
 
             if (count > 0) {
                 outputView.printBenefitCanNotApplyDueStockLack(item.getName(), count);
@@ -74,6 +73,9 @@ public class ConvenienceStore {
             }
         }
 
+        // orderItems 변동에 따른 promotionAppliedItems 최신화
+        promotionAppliedItems = calculatePromotionAppliedItems(orderItems, stock, pc);
+
         // 7. Order, Payment 생성
         Order order = new Order(orderItems);
         Payment payment = new Payment(order, stock);
@@ -83,7 +85,7 @@ public class ConvenienceStore {
         boolean membershipDC = inputView.readYesNo();
 
         // 9. 영수증 출력
-        ReceiptDto receiptDto = createReceiptDto(payment, promotionAppliedItems, membershipDC, promotionCatalog);
+        ReceiptDto receiptDto = createReceiptDto(payment, promotionAppliedItems, membershipDC, pc);
         outputView.printTotalReceipt(receiptDto);
         // 10. 재고 차감
 
