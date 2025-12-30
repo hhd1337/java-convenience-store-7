@@ -18,14 +18,14 @@ public class InputParser {
             String[] parts = normalized.split(NAME_QUANTITY_DELIMITER, 2);
 
             if (parts.length != 2) {
-                throw new IllegalArgumentException(ErrorMessage.PREFIX + "올바른 형식으로 입력해주세요.");
+                throw new IllegalArgumentException(ErrorMessage.PREFIX + "올바르지 않은 형식으로 입력했습니다. 다시 입력해주세요.");
             }
 
             String name = parts[0].trim();
             String qtyStr = parts[1].trim();
 
             if (name.isEmpty() || qtyStr.isEmpty()) {
-                throw new IllegalArgumentException(ErrorMessage.PREFIX + "올바른 형식으로 입력해주세요.");
+                throw new IllegalArgumentException(ErrorMessage.PREFIX + "올바르지 않은 형식으로 입력했습니다. 다시 입력해주세요.");
             }
 
             int quantity = StringToIntParser.parseInt(qtyStr);

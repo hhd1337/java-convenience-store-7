@@ -20,7 +20,7 @@ public final class StringToIntParser {
         try {
             return Integer.parseInt(value.trim());
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException(ErrorMessage.PREFIX + "올바른 형식으로 입력해주세요.");
+            throw new IllegalArgumentException(ErrorMessage.PREFIX + "올바른 정수 형식으로 입력해주세요.");
         }
     }
 }

@@ -14,7 +14,7 @@ public class Stock {
         if (products.stream().noneMatch(
                 p -> p.getName().equals(name)
         )) {
-            throw new IllegalArgumentException(ErrorMessage.PREFIX + "존재하지 않는 상품입니다. 상품이름을 다시 입력해주세요.");
+            throw new IllegalArgumentException(ErrorMessage.PREFIX + "존재하지 않는 상품입니다. 다시 입력해주세요.");
         }
     }
 
@@ -36,7 +36,7 @@ public class Stock {
                 .filter(p -> p.getName().equals(name))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException(
-                        ErrorMessage.PREFIX + " " + name + "은 존재하지 않는 상품입니다. 다시 입력해주세요."))
+                        ErrorMessage.PREFIX + " 존재하지 않는 상품입니다. 다시 입력해주세요."))
                 .getPrice();
     }
 
