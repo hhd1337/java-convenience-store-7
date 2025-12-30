@@ -21,7 +21,7 @@ public class OutputView {
     }
 
     public void printBenefitCanNotApplyDueStockLack(String itemName, int benefitNotApplyCount) {
-        System.out.println("현재 " + itemName + "은(는)" + benefitNotApplyCount + "개를 무료로 더 받을 수 있습니다. 추가하시겠습니까?");
+        System.out.println("현재 " + itemName + " " + benefitNotApplyCount + "개는 프로모션 할인이 적용되지 않습니다. 그래도 구매하시겠습니까?");
         System.out.print("(Y/N)");
     }
 
