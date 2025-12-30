@@ -58,7 +58,8 @@ public class ConvenienceStore {
             int addCount = getAdditionalFreeCount(item, stock, pc, today);
             if (addCount > 0) {
                 outputView.printGetMoreItemDuePromotion(item.getName(), addCount);
-                if (retryUntilValid(inputView::readYesNo)) {
+                boolean yes = retryUntilValid(inputView::readYesNo);
+                if (yes) {
                     item.increaseQuantity(addCount);
                 }
             }
@@ -99,6 +100,8 @@ public class ConvenienceStore {
         // 10. 재고 차감
 
         // 11. 다른상품구매할지 입력받아 해당 여부에 따라 while문 탈출/종료 혹은 1번으로 돌아갈지 결정
+        outputView.printMorePurchaseAskMessage();
+        boolean yes = retryUntilValid(inputView::readYesNo);
 
     }
 
@@ -201,18 +204,15 @@ public class ConvenienceStore {
             return Math.max(0, orderQuantity - promotionApplicable);
 
         } catch (IllegalArgumentException e) {
-            return orderQuantity; // 프로모션 상품이 없으면, 프로모션 적용 불가 수량 = 전체 주문 수량
+            return 0; // 프로모션 상품이 없으면, 프로모션 할인 자체가 없으므로 0을 리턴
         }
     }
 
     private int getAdditionalFreeCount(OrderItem item, Stock stock, PromotionCatalog pc, LocalDate today) {
-        String itemName = item.getName();
-        int orderQuantity = item.getQuantity();
+        String itemName = item.getName(); // "비타민워터"
+        int orderQuantity = item.getQuantity(); // 3
         Promotion promotion = findPromotionOrNull(itemName, stock, pc);
-        if (promotion != null) {
-            if (!promotion.isActive(today)) {
-                return 0;
-            }
+        if (promotion != null && promotion.isActive(today)) {
             int get = promotion.getGet();
             int buy = promotion.getBuy();
             int cycle = buy + get;
