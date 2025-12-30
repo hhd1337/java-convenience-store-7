@@ -97,12 +97,35 @@ public class ConvenienceStore {
         // 9. 영수증 출력
         ReceiptDto receiptDto = createReceiptDto(payment, promotionAppliedItems, membershipDC, pc, today);
         outputView.printTotalReceipt(receiptDto);
-        // 10. 재고 차감
 
+        // 10. 재고 차감
+        // PromotionAppliedItem, OrderItem 가지고 NormalItem 만듦
+        List<OrderItem> normalItems = createNormalItems(promotionAppliedItems, orderItems);
+        // PromotionAppliedItem 쭉 차감
+
+        // NormalItem 쭉 차감
+        //stock.decreaseStock();
         // 11. 다른상품구매할지 입력받아 해당 여부에 따라 while문 탈출/종료 혹은 1번으로 돌아갈지 결정
         outputView.printMorePurchaseAskMessage();
         boolean yes = retryUntilValid(inputView::readYesNo);
+    }
 
+    private List<OrderItem> createNormalItems(List<PromotionAppliedItem> promoAppliedItems,
+                                              List<OrderItem> orderItems) {
+        return orderItems.stream()
+                .map(orderItem -> {
+                    int orderQty = orderItem.getQuantity();
+
+                    int promoAppliedQty = promoAppliedItems.stream()
+                            .filter(p -> p.name().equals(orderItem.getName()))
+                            .mapToInt(PromotionAppliedItem::quantity)
+                            .sum();
+
+                    int normalQty = orderQty - promoAppliedQty;
+
+                    return new OrderItem(orderItem.getName(), normalQty);
+                })
+                .toList();
     }
 
     private ReceiptDto createReceiptDto(Payment payment, List<PromotionAppliedItem> promotionAppliedItems,
