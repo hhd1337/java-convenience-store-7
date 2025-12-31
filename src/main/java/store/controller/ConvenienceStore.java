@@ -84,9 +84,6 @@ public class ConvenienceStore {
                 if (!yes) { // 4-3. OrderItem에 반영
                     item.decreaseQuantity(count); // 정가결제 안한다고 함. -> 아이템 수량 count 만큼 차감해야 함.
                 }
-                // 정가결제 한다고 함. -> 아이템 수량 조작할 필요 없음.
-                // "해당 수량만큼 정가결제 할거다." 는 기록 할 필요 없음.
-                // 그냥 계산로직을 프로모션 다 쓰면 정가품목으로 계산하게 하면 됨.
             }
         }
 
@@ -210,9 +207,13 @@ public class ConvenienceStore {
         for (OrderItem item : orderItems) {
             String name = item.getName();
             // 이 아이템이 프로모션상품이 없으면 다음 아이템으로 넘어감.
+            String promotionName;
             try {
-                stock.findPromotionOrNullByProductName(name);
+                promotionName = stock.findPromotionOrNullByProductName(name);
             } catch (IllegalArgumentException e) {
+                continue;
+            }
+            if (promotionName == null) {
                 continue;
             }
 
@@ -235,6 +236,9 @@ public class ConvenienceStore {
         try {
             int promotionStockQuantity = stock.findPromotionProductCountByName(itemName);
             String promotionName = stock.findPromotionOrNullByProductName(itemName);
+            if (promotionName == null) {
+                return 0;
+            }
             Promotion promotion = pc.findPromotionByName(promotionName);
             int get = promotion.getGet();
             int buy = promotion.getBuy();
